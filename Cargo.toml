@@ -1,0 +1,27 @@
+[workspace]
+members = ["crates/*"]
+resolver = "2"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[workspace.dependencies]
+anyhow = "1.0.79"
+async-trait = "0.1.77"
+axum = { version = "0.7.3", features = ["macros"] }
+clap = { version = "4.4.13", features = ["env", "derive"] }
+dotenvy = "0.15.7"
+lazy_static = "1.4.0"
+mongodb = { version = "2.8.0" }
+pbkdf2 = "0.12.2"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.68"
+time = "0.3.31"
+thiserror = "1.0.56"
+tokio = { version = "1", features = ["full"] }
+tokio-stream = { version = "0.1.14" }
+tower = { version = "0.4.13", features = ["timeout", "buffer", "limit"] }
+tower-http = { version = "0.5.0", features = ["fs", "trace", "cors"] }
+tracing = { version = "0.1.40" }
+tracing-appender = "0.2.3"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+validator = { version = "0.16.1", features = ["derive"] }

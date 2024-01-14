@@ -1,0 +1,18 @@
+[package]
+name = "database"
+version = "0.1.0"
+edition = "2021"
+metadata.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+async-trait = { workspace = true }
+mongodb = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+time = { workspace = true }
+tokio-stream = { workspace = true }
+tracing = { workspace = true }
+utils = { path = "../utils" }
+validator = { workspace = true }
