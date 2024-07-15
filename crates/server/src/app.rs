@@ -12,7 +12,7 @@ use crate::{logger::Logger, router::AppRouter};
 pub struct ApplicationServer;
 impl ApplicationServer {
     pub async fn serve(config: Arc<AppConfig>) -> anyhow::Result<()> {
-        let _guard = Logger::new(config.cargo_env);
+        let _guard = Logger::init(config.cargo_env);
 
         let address = format!("{}:{}", config.app_host, config.app_port);
         let tcp_listener = tokio::net::TcpListener::bind(address)
@@ -27,7 +27,7 @@ impl ApplicationServer {
 
         let db = Database::new(config.clone()).await?;
         let services = Services::new(db);
-        let router = AppRouter::new(services);
+        let router = AppRouter::init(services);
 
         serve(tcp_listener, router)
             .with_graceful_shutdown(Self::shutdown_signal())
@@ -56,8 +56,8 @@ impl ApplicationServer {
         let terminate = std::future::pending::<()>();
 
         tokio::select! {
-            _ = ctrl_c => {},
-            _ = terminate => {},
+            () = ctrl_c => {},
+            () = terminate => {},
         }
 
         tracing::warn!("❌ Signal received, starting graceful shutdown...");

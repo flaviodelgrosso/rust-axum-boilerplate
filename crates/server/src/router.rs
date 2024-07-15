@@ -25,9 +25,10 @@ lazy_static! {
     static ref HTTP_TIMEOUT: u64 = 30;
 }
 
+#[allow(clippy::module_name_repetitions)]
 pub struct AppRouter;
 impl AppRouter {
-    pub fn new(services: Services) -> Router {
+    pub fn init(services: Services) -> Router {
         let cors = CorsLayer::new()
             .allow_origin(Any)
             .allow_methods([
@@ -41,7 +42,7 @@ impl AppRouter {
 
         let index = ServeDir::new("dist").not_found_service(ServeFile::new("dist/index.html"));
 
-        let router = Router::new()
+        Router::new()
             .nest_service("/", index)
             .nest("/api/v1", api::app())
             .layer(cors)
@@ -54,11 +55,10 @@ impl AppRouter {
                     .layer(BufferLayer::new(1024))
                     .layer(RateLimitLayer::new(5, Duration::from_secs(1))),
             )
-            .fallback(Self::handle_404);
-
-        router
+            .fallback(Self::handle_404)
     }
 
+    #[allow(clippy::unused_async)]
     async fn handle_404() -> impl IntoResponse {
         (
             StatusCode::NOT_FOUND,
@@ -69,6 +69,7 @@ impl AppRouter {
         )
     }
 
+    #[allow(clippy::unused_async)]
     async fn handle_timeout_error(err: BoxError) -> (StatusCode, Json<serde_json::Value>) {
         if err.is::<tower::timeout::error::Elapsed>() {
             (

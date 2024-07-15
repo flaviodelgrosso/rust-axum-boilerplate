@@ -5,6 +5,7 @@ pub enum CargoEnv {
 }
 
 #[derive(clap::Parser)]
+#[allow(clippy::module_name_repetitions)]
 pub struct AppConfig {
     #[clap(long, env, value_enum)]
     pub cargo_env: CargoEnv,

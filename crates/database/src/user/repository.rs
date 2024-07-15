@@ -10,6 +10,7 @@ use tokio_stream::StreamExt;
 use crate::{user::model::User, Database};
 use utils::AppResult;
 
+#[allow(clippy::module_name_repetitions)]
 pub type DynUserRepository = Arc<dyn UserRepositoryTrait + Send + Sync>;
 
 #[async_trait]
@@ -53,14 +54,14 @@ impl UserRepositoryTrait for Database {
             password: password.to_string(),
         };
 
-        let user = self.user_col.insert_one(new_doc, None).await?;
+        let user = self.user_col.insert_one(new_doc).await?;
 
         Ok(user)
     }
 
     async fn get_user_by_email(&self, email: &str) -> AppResult<Option<User>> {
         let filter = doc! {"email": email};
-        let user_detail = self.user_col.find_one(filter, None).await?;
+        let user_detail = self.user_col.find_one(filter).await?;
 
         Ok(user_detail)
     }
@@ -68,7 +69,7 @@ impl UserRepositoryTrait for Database {
     async fn get_user_by_id(&self, id: &str) -> AppResult<Option<User>> {
         let obj_id = ObjectId::parse_str(id)?;
         let filter = doc! {"_id": obj_id};
-        let user_detail = self.user_col.find_one(filter, None).await?;
+        let user_detail = self.user_col.find_one(filter).await?;
 
         Ok(user_detail)
     }
@@ -91,7 +92,7 @@ impl UserRepositoryTrait for Database {
                 },
         };
 
-        let updated_doc = self.user_col.update_one(filter, new_doc, None).await?;
+        let updated_doc = self.user_col.update_one(filter, new_doc).await?;
 
         Ok(updated_doc)
     }
@@ -99,13 +100,14 @@ impl UserRepositoryTrait for Database {
     async fn delete_user(&self, id: &str) -> AppResult<DeleteResult> {
         let obj_id = ObjectId::parse_str(id)?;
         let filter = doc! {"_id": obj_id};
-        let user_detail = self.user_col.delete_one(filter, None).await?;
+        let user_detail = self.user_col.delete_one(filter).await?;
 
         Ok(user_detail)
     }
 
     async fn get_all_users(&self) -> AppResult<Vec<User>> {
-        let mut cursor = self.user_col.find(None, None).await?;
+        let filter = doc! {};
+        let mut cursor = self.user_col.find(filter).await?;
 
         let mut users: Vec<User> = Vec::new();
         while let Some(doc) = cursor.next().await {

@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 #[derive(Clone, Serialize, Deserialize, Debug, Validate, Default)]
+#[allow(clippy::module_name_repetitions)]
 pub struct SignUpUserDto {
     #[validate(required, length(min = 1))]
     pub name: Option<String>,

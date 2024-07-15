@@ -23,6 +23,7 @@ pub struct HttpError {
 }
 
 impl HttpError {
+    #[must_use]
     pub fn new(error: String) -> Self {
         Self { error }
     }
@@ -71,47 +72,31 @@ pub enum AppError {
 }
 
 impl AppError {
+    #[must_use]
     /// Maps `validator`'s `ValidationrErrors` to a simple map of property name/error messages structure.
     pub fn unprocessable_entity(errors: ValidationErrors) -> Response {
         let mut validation_errors = ErrorMap::new();
 
         for (field_property, error_kind) in errors.into_errors() {
             if let ValidationErrorsKind::Field(field_meta) = error_kind.clone() {
-                for error in field_meta.into_iter() {
+                for error in field_meta {
                     validation_errors
                         .entry(Cow::from(field_property))
-                        .or_insert_with(Vec::new)
+                        .or_default()
                         .push(error.message.unwrap_or_else(|| {
                             let params: Vec<Cow<'static, str>> = error
                                 .params
                                 .iter()
-                                .filter(|(key, _value)| key.to_owned() != "value")
-                                .map(|(key, value)| {
-                                    Cow::from(format!("{} value is {}", key, value.to_string()))
-                                })
+                                .filter(|(key, _value)| *key != "value")
+                                .map(|(key, value)| Cow::from(format!("{key} value is {value}")))
                                 .collect();
 
-                            if params.len() >= 1 {
-                                Cow::from(params.join(", "))
+                            if params.is_empty() {
+                                Cow::from(format!("{field_property} is required"))
                             } else {
-                                Cow::from(format!("{} is required", field_property))
+                                Cow::from(params.join(", "))
                             }
-                        }))
-                }
-            }
-
-            if let ValidationErrorsKind::Struct(meta) = error_kind.clone() {
-                for (struct_property, struct_error_kind) in meta.into_errors() {
-                    if let ValidationErrorsKind::Field(field_meta) = struct_error_kind {
-                        for error in field_meta.into_iter() {
-                            validation_errors
-                                .entry(Cow::from(struct_property))
-                                .or_insert_with(Vec::new)
-                                .push(error.message.unwrap_or_else(|| {
-                                    Cow::from(format!("{} is required", struct_property))
-                                }));
-                        }
-                    }
+                        }));
                 }
             }
         }
